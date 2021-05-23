@@ -126,7 +126,7 @@ function getAndSaveImages(query, numberOfPhotos) {
           });
       } else {
         console.log(
-          `skipped photo ${dowloadedImg} because there is no extension`
+          `skipped photo ${dowloadedImg} because there is no/invalid extension`
         );
       }
     }
