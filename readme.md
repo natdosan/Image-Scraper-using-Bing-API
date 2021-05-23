@@ -19,3 +19,9 @@ Instead of typing the search query and maximum amount in the script, you can sup
 node index.js -s "Trees" -a 30
 # Get a maximum of 30 photos of "Trees"
 ```
+
+You can also specify an output directory:
+
+```bash
+node index.js -s "Trees" -a 30 -o ./trees
+```

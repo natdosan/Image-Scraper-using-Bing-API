@@ -20,6 +20,11 @@ const argv = yargs(hideBin(process.argv))
     description: "The maximum amount of photos to download",
     alias: "a",
     type: "number",
+  })
+  .option("outDir", {
+    description: "Output directory",
+    alias: "o",
+    type: "string",
   }).argv;
 
 function download(url, image_path) {
@@ -96,9 +101,10 @@ async function getImages(query, start, numberOfPhotos) {
 
 function getAndSaveImages(query, numberOfPhotos) {
   getImages(query, 0, numberOfPhotos).then(async (filesArray) => {
-    fs.access("./downloaded", (err) => {
+    let outPath = argv.outDir ?? "./downloaded";
+    fs.access(outPath, (err) => {
       if (err) {
-        fs.mkdirSync("./downloaded");
+        fs.mkdirSync(outPath);
       } else {
         return;
       }
@@ -114,10 +120,7 @@ function getAndSaveImages(query, numberOfPhotos) {
           dowloadedImg
         )
       ) {
-        download(
-          filesArray[i],
-          path.join(__dirname, "downloaded", dowloadedImg)
-        )
+        download(filesArray[i], path.resolve(__dirname, outPath, dowloadedImg))
           .then(() => {
             console.log(`downloaded photo ${dowloadedImg}`);
           })
