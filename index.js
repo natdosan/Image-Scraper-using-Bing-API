@@ -17,7 +17,7 @@ const argv = yargs(hideBin(process.argv))
     type: "string",
   })
   .option("amount", {
-    description: "The amount of photos to download",
+    description: "The maximum amount of photos to download",
     alias: "a",
     type: "number",
   }).argv;
@@ -158,7 +158,7 @@ if ("search" in argv || "amount" in argv) {
 } else {
   // if no arguments are present
   rl.question("What do you want to search for? ", (query) => {
-    rl.question("How many photos do you want? ", (numberOfPhotos) => {
+    rl.question("Maximum amount of photos? ", (numberOfPhotos) => {
       totalPhotosRequested = numberOfPhotos;
       getAndSaveImages(query, parseInt(numberOfPhotos));
       rl.close();
