@@ -1,7 +1,6 @@
 const axios = require("axios");
 const path = require("path");
 const fs = require("fs");
-const url = require("url"); // https://github.com/axios/axios#query-string
 const readline = require("readline");
 const rl = readline.createInterface({
   input: process.stdin,
