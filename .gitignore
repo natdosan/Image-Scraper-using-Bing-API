@@ -2,3 +2,11 @@
 node_modules/
 profkylan.jpg
 downloaded/
+
+# Ignore media files
+*.[jJ][pP][gG]
+*.[jJ][pP][eE][gG]
+*.[pP][nN][gG]
+*.[gG][iI][fF]
+*.[wW][eE][bB][pP]
+*.[jJ][iI][fF][fF]

@@ -1,13 +1,31 @@
 const axios = require("axios");
 const path = require("path");
 const fs = require("fs");
-const url = require("url"); // https://github.com/axios/axios#query-string
+const yargs = require("yargs/yargs");
+const { hideBin } = require("yargs/helpers");
 const readline = require("readline");
 const rl = readline.createInterface({
   input: process.stdin,
   output: process.stdout,
 });
 require("dotenv").config(); // https://www.npmjs.com/package/dotenv
+
+const argv = yargs(hideBin(process.argv))
+  .option("search", {
+    description: "What to search for",
+    alias: "s",
+    type: "string",
+  })
+  .option("amount", {
+    description: "The maximum amount of photos to download",
+    alias: "a",
+    type: "number",
+  })
+  .option("outDir", {
+    description: "Output directory",
+    alias: "o",
+    type: "string",
+  }).argv;
 
 function download(url, image_path) {
   // https://stackoverflow.com/questions/12740659/downloading-images-with-node-js
@@ -83,9 +101,10 @@ async function getImages(query, start, numberOfPhotos) {
 
 function getAndSaveImages(query, numberOfPhotos) {
   getImages(query, 0, numberOfPhotos).then(async (filesArray) => {
-    fs.access("./downloaded", (err) => {
+    let outPath = argv.outDir ?? "./downloaded";
+    fs.access(outPath, (err) => {
       if (err) {
-        fs.mkdirSync("./downloaded");
+        fs.mkdirSync(outPath);
       } else {
         return;
       }
@@ -101,10 +120,7 @@ function getAndSaveImages(query, numberOfPhotos) {
           dowloadedImg
         )
       ) {
-        download(
-          filesArray[i],
-          path.join(__dirname, "downloaded", dowloadedImg)
-        )
+        download(filesArray[i], path.resolve(__dirname, outPath, dowloadedImg))
           .then(() => {
             console.log(`downloaded photo ${dowloadedImg}`);
           })
@@ -113,17 +129,42 @@ function getAndSaveImages(query, numberOfPhotos) {
           });
       } else {
         console.log(
-          `skipped photo ${dowloadedImg} because there is no extension`
+          `skipped photo ${dowloadedImg} because there is no/invalid extension`
         );
       }
     }
   });
 }
 
-rl.question("What do you want to search for? ", (query) => {
-  rl.question("How many photos do you want? ", (numberOfPhotos) => {
-    totalPhotosRequested = numberOfPhotos;
-    getAndSaveImages(query, parseInt(numberOfPhotos));
-    rl.close();
+if ("search" in argv || "amount" in argv) {
+  // if arguments are present
+  rl.close();
+
+  const searchQuery = argv.search;
+  const amount = argv.amount;
+  const searchArgHasValidString =
+    /\S/.test(searchQuery) && (searchQuery ?? false);
+  const amountArgHasValidNumber = typeof amount != "undefined";
+
+  if (searchArgHasValidString && amountArgHasValidNumber) {
+    totalPhotosRequested = amount;
+    getAndSaveImages(searchQuery, amount);
+  } else {
+    if (!searchArgHasValidString) {
+      console.error("Missing or invalid search query argument");
+    }
+    if (!amountArgHasValidNumber) {
+      console.error("Missing or invalid amount argument");
+    }
+    console.log("Use --help to bring up arguments help");
+  }
+} else {
+  // if no arguments are present
+  rl.question("What do you want to search for? ", (query) => {
+    rl.question("Maximum amount of photos? ", (numberOfPhotos) => {
+      totalPhotosRequested = numberOfPhotos;
+      getAndSaveImages(query, parseInt(numberOfPhotos));
+      rl.close();
+    });
   });
-});
+}
