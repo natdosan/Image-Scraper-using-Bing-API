@@ -79,7 +79,7 @@ async function getImages(query, start, numberOfPhotos) {
     }
     console.log(`filesArray now has ${filesArray.length} photos of ${query}`);
     setTimeout(function () {
-      console.log(totalPhotosRequested - filesArray.length);
+      console.log(totalPhotosRequested - filesArray.length, " photos left");
       if (totalPhotosRequested - filesArray.length >= 150) {
         // request 150 more
         resolve(getImages(query, start + 150, 150)); // recurser function because it runs until a condition is satisfied
