@@ -1,4 +1,4 @@
-# dlwlrma
+# Image Scraper using Bing API
 
 ## Usage
 
